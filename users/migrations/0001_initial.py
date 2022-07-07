@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name='Platform',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('platform_id', models.BigIntegerField()),
+                ('serial_number', models.BigIntegerField()),
             ],
             options={
                 'db_table': 'platforms',
@@ -39,10 +39,10 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('email', models.CharField(max_length=80, unique=True)),
+                ('email', models.CharField(max_length=80, null=True, unique=True)),
                 ('password', models.CharField(max_length=200, null=True)),
                 ('nickname', models.CharField(max_length=80, null=True)),
-                ('profile_image_url', models.CharField(max_length=80, null=True)),
+                ('profile_image_url', models.CharField(max_length=1000, default='https://cdn-icons-png.flaticon.com/512/1450/1450252.png')),
                 ('date_of_birth', models.DateField(null=True)),
                 ('platform', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='users.platform')),
             ],
