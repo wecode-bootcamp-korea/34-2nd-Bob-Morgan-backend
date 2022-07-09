@@ -1,3 +1,4 @@
+
 from django.db import models
 
 class Place(models.Model):
@@ -57,4 +58,5 @@ class Region(models.Model):
 
     class Meta:
         db_table = 'regions'
+
 
