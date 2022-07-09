@@ -1,3 +1,63 @@
-from django.shortcuts import render
+from django.http      import JsonResponse
+from django.views     import View
+from django.db.models import Q, Avg, Min, Max
 
-# Create your views here.
+from places.models import Place
+
+class PlaceSearchView(View):
+    def get(self, request):
+        try:
+            regions    = request.GET.getlist('region')
+            categories = request.GET.getlist('category')
+
+            sort   = request.GET.get('sort')
+            offset = int(request.GET.get('offset', 0))
+            limit  = int(request.GET.get('limit', 20))
+
+            q_region = Q()
+            q_category = Q()
+
+            if regions:
+                for region in regions:
+                    q_region |= Q(region__name = region)
+
+            if categories:
+                for category in categories:
+                    q_category |= Q(category__name = category)
+
+            sort_set = {
+                'avg-price-ascending'  : 'avg_price',
+                'avg-price-descending' : '-avg_price',
+                'min-price-ascending'  : 'min_price',
+                'max-price-descending' : '-max_price',
+                'random'               : '?',
+            }
+
+            order_key = sort_set.get(sort, 'id')
+
+            places = Place.objects.annotate(
+                min_price = Min('placemenu__price__price'),
+                max_price = Max('placemenu__price__price'),
+                avg_price = Avg('placemenu__price__price')
+                ).filter(q_region & q_category).order_by(order_key)[offset : offset + limit]
+
+            results = [{
+                'place_id'                           : place.id,
+                'place_name'                         : place.name,
+                'place_opening_hours'                : place.opening_hours,
+                'place_maximum_number_of_subscriber' : place.maximum_number_of_subscriber,
+                'place_able_to_reserve'              : place.able_to_reserve,
+                'place_closed_temporarily'           : place.closed_temporarily,
+                'place_category'                     : place.category.name,
+                'place_region'                       : place.region.name,
+                'place_image'                        : place.image_set.all().first().image_url if place.image_set.all() else None,
+                'menu_name_list'                     : [menu.name for menu in place.menus.all()],
+                'menu_price_list'                    : [menu.price.price for menu in place.placemenu_set.all()],
+                'menu_is_signature'                  : [menu.is_signature for menu in place.placemenu_set.all()],
+                'menu_avg_price'                     : place.avg_price,
+                'menu_min_price'                     : place.min_price,
+                'menu_max_price'                     : place.max_price,
+            } for place in places]
+            return JsonResponse({'results' : results}, status = 200)
+        except KeyError:
+            return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
