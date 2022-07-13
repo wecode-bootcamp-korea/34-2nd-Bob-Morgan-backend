@@ -2,9 +2,10 @@ import jwt
 
 from django.test   import Client, TestCase
 from django.conf   import settings
-from unittest.mock import patch, MagicMock
+from unittest      import mock
 
 from users.models import Platform, User, SocialNetwork
+from core.utils   import KaKaoAPI
 
 class KakaoSigninTest(TestCase):
     def setUp(self):
@@ -29,7 +30,8 @@ class KakaoSigninTest(TestCase):
         Platform.objects.all().delete()
         User.objects.all().delete()
 
-    @patch('users.views.requests')
+    # @patch('users.views.requests')
+    @mock.patch.object(KaKaoAPI, 'get_user_info')
     def test_success_kakao_signup(self, mocked_requests):
         client = Client()
         class MockedResponse:
@@ -57,7 +59,9 @@ class KakaoSigninTest(TestCase):
                         'email': 'kakao-signup@kakao.com'
                     }
                 }
-        mocked_requests.get = MagicMock(return_value = MockedResponse())
+        # mocked_requests.get = MagicMock(return_value = MockedResponse())
+        mocked_requests.return_value = MockedResponse().json()
+
         headers             = {'HTTP_Authorization': 'mocked_access_token'}
         response            = client.get('/users/signin/kakao', **headers)
         access_token        = jwt.encode({'id': User.objects.latest('id').id}, settings.SECRET_KEY, settings.ALGORITHM)
@@ -69,7 +73,8 @@ class KakaoSigninTest(TestCase):
             }
         )
 
-    @patch('users.views.requests')
+    # @patch('users.views.requests')
+    @mock.patch.object(KaKaoAPI, 'get_user_info')
     def test_success_kakao_signin(self, mocked_requests):
         client = Client()
 
@@ -98,7 +103,9 @@ class KakaoSigninTest(TestCase):
                         'email': 'test@kakao.com'
                     }
                 }
-        mocked_requests.get = MagicMock(return_value = MockedResponse())
+        # mocked_requests.get = MagicMock(return_value = MockedResponse())
+        mocked_requests.return_value = MockedResponse().json()
+
         headers             = {'HTTP_Authorization': 'mocked_access_token'}
         response            = client.get('/users/signin/kakao', **headers)
         access_token        = jwt.encode({'id': User.objects.latest('id').id}, settings.SECRET_KEY, settings.ALGORITHM)

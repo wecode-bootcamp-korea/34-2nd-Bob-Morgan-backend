@@ -5,15 +5,19 @@ from django.views import View
 from django.conf  import settings
 
 from users.models import User, SocialNetwork, Platform
+from core.utils   import KaKaoAPI
 
 class KakaoSigninView(View):
     def get(self, request):
         try:
+            # kakao_token = request.headers.get('Authorization')
+            # KAKAO_URL   = 'https://kapi.kakao.com/v2/user/me'
+            # headers     = {'Authorization': f'Bearer {kakao_token}'}
+            # response    = requests.get(KAKAO_URL, headers=headers, timeout=3)
+            # kakao_user  = response.json()
+
             kakao_token = request.headers.get('Authorization')
-            KAKAO_URL   = 'https://kapi.kakao.com/v2/user/me'
-            headers     = {'Authorization': f'Bearer {kakao_token}'}
-            response    = requests.get(KAKAO_URL, headers=headers, timeout=3)
-            kakao_user  = response.json()
+            kakao_user  = KaKaoAPI.get_user_info(kakao_token)
 
             kakao_id          = kakao_user['id']
             kakao_nickname    = kakao_user['kakao_account']['profile']['nickname']
