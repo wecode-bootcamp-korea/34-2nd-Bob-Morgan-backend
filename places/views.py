@@ -2,11 +2,28 @@ from django.http      import JsonResponse
 from django.views     import View
 from django.db.models import Q, Avg, Min, Max
 
+# from places.models import Place, RegionEnum
 from places.models import Place
+from decorators    import query_debugger
+
+
+# class ResionListView(View):
+#     def get(self, request):
+#         try:
+#             result = [{
+#                 'resion_id' : region.value,
+#                 'resion_name' : region.name
+#             }for region in RegionEnum]
+
+#             return JsonResponse({'resion_list' : result}, status=200)
+#         except:
+#             pass
 
 class PlaceSearchView(View):
+    @query_debugger
     def get(self, request):
         try:
+            date       = request.GET.get('date')
             regions    = request.GET.getlist('region')
             categories = request.GET.getlist('category')
 
@@ -17,13 +34,13 @@ class PlaceSearchView(View):
             q_region = Q()
             q_category = Q()
 
+            # id로 받는게 좋음 **
+
             if regions:
-                for region in regions:
-                    q_region |= Q(region__name = region)
+                q_region |= Q(region__name__in = regions)
 
             if categories:
-                for category in categories:
-                    q_category |= Q(category__name = category)
+                q_category |= Q(category__name__in = categories)
 
             sort_set = {
                 'avg-price-ascending'  : 'avg_price',
@@ -35,7 +52,13 @@ class PlaceSearchView(View):
 
             order_key = sort_set.get(sort, 'id')
 
-            places = Place.objects.annotate(
+            # places = Place.objects.annotate(
+            #     min_price = Min('placemenu__price__price'),
+            #     max_price = Max('placemenu__price__price'),
+            #     avg_price = Avg('placemenu__price__price')
+            #     ).filter(q_region & q_category).order_by(order_key)[offset : offset + limit]
+
+            places = Place.objects.select_related('category', 'region').prefetch_related('placemenu_set__price', 'menus', 'image_set').annotate(
                 min_price = Min('placemenu__price__price'),
                 max_price = Max('placemenu__price__price'),
                 avg_price = Avg('placemenu__price__price')
