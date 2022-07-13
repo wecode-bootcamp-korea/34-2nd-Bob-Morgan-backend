@@ -1,3 +1,5 @@
+from enum import Enum
+
 from django.db import models
 
 class Place(models.Model):
@@ -58,3 +60,10 @@ class Region(models.Model):
     class Meta:
         db_table = 'regions'
 
+
+# class CategoryEnum(Enum):
+
+
+# class RegionEnum(Enum):
+#     제주시 = 1
+#     애월 . 한림 = 2
