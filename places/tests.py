@@ -68,10 +68,19 @@ class PlaceSearchViewTest(TestCase):
             PlaceMenu(menu_id = 6, place_id = 2, price_id = 16, is_signature = False),
         ])
         Image.objects.bulk_create([
-            Image(image_url = 'https://mustgo.carmore.kr/data/file/matzip/977797506_dMG6qOYk_bbb37afa85c4c5bf67abe3e40aea39f356c852bf.jpeg', place_id  = 1),
-            Image(image_url = 'https://mustgo.carmore.kr/data/file/matzip/977797506_TEPcAJMy_8808aea72589ba335d85f349ce8729bbb4144445.jpeg', place_id  = 2),
+            Image(id = 1, image_url = 'https://mustgo.carmore.kr/data/file/matzip/977797506_dMG6qOYk_bbb37afa85c4c5bf67abe3e40aea39f356c852bf.jpeg', place_id  = 1),
+            Image(id = 51, image_url = 'https://cdn.pixabay.com/photo/2015/07/12/14/26/coffee-842020__480.jpg', place_id  = 1),
+            Image(id = 52, image_url = 'https://media.istockphoto.com/photos/traditional-cafe-picture-id1356951371?b=1&k=20&m=1356951371&s=170667a&w=0&h=OCoZRi_qJmIiUvMRt8qMxHVraRtklgte4QtfDbeFSgM=', place_id  = 1),
+            Image(id = 53, image_url = 'https://cdn.pixabay.com/photo/2014/12/11/02/55/cereals-563796__480.jpg', place_id  = 1),
+            Image(id = 54, image_url = 'https://images.unsplash.com/photo-1481391032119-d89fee407e44?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTR8fGZvb2RzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60', place_id  = 1),
+            Image(id = 55, image_url = 'https://cdn.pixabay.com/photo/2017/07/28/14/29/macarons-2548827__480.jpg', place_id  = 1),
+            Image(id = 2, image_url = 'https://mustgo.carmore.kr/data/file/matzip/977797506_TEPcAJMy_8808aea72589ba335d85f349ce8729bbb4144445.jpeg', place_id  = 2),
+            Image(id = 56, image_url = 'https://media.istockphoto.com/photos/korean-bbq-picture-id503205965?b=1&k=20&m=503205965&s=170667a&w=0&h=ilozw4fmtVJRaW_J7i5DiGj2CldrECeoCAM-GmuCQlw=', place_id  = 2),
+            Image(id = 57, image_url = 'https://media.istockphoto.com/photos/sharing-good-food-and-wine-with-friend-picture-id949081542?b=1&k=20&m=949081542&s=170667a&w=0&h=HCivTNySVjMQ6xQKVJUhh9Y0EOiHNN0seh_gaPthWWQ=', place_id  = 2),
+            Image(id = 58, image_url = 'https://images.unsplash.com/photo-1590301157890-4810ed352733?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8a29yZWFuJTIwZm9vZHN8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60', place_id  = 2),
+            Image(id = 59, image_url = 'https://images.unsplash.com/photo-1553163147-622ab57be1c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8a29yZWFuJTIwZm9vZHN8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60', place_id  = 2),
+            Image(id = 60, image_url = 'https://media.istockphoto.com/photos/korean-seafood-tofu-stew-picture-id157774918?b=1&k=20&m=157774918&s=170667a&w=0&h=nEyobW5LyAXhSWQlfIoVEwHgqDsVzYvibCFU2XRZKy0=', place_id  = 2),
         ])
-
 
     def tearDown(self):
         Menu.objects.all().delete()
@@ -252,5 +261,74 @@ class PlaceSearchViewTest(TestCase):
                     }
                 ],
                 "date": "2022-02-07"
+            })
+            self.assertEqual(response.status_code, 200)
+
+    def test_success_place_detail_get(self):
+            client = Client()
+
+            response = client.get('/places/1')
+
+            self.assertEqual(response.json(),{
+                "results": {
+                    "place_id": 1,
+                        "place_name": "토투가커피",
+                        "place_address": "제주특별자치도 제주시 한림읍 귀덕9길 19",
+                        "place_opening_hours": "10:00 - 18:00, 연중무휴",
+                        "place_description": "맞아, 까눌레는 이래야지! 라는 말이 절로 나오는 집!",
+                        "place_maximum_number_of_subscriber": 0,
+                        "place_latitude": "33.44283842",
+                        "place_longitude": "126.28994200",
+                        "place_able_to_reserve": False,
+                        "place_closed_temporarily": False,
+                        "place_category": "카페",
+                        "place_region": "애월_한림",
+                        "place_images": [
+                            {
+                                "id": 1,
+                                "url": "https://mustgo.carmore.kr/data/file/matzip/977797506_dMG6qOYk_bbb37afa85c4c5bf67abe3e40aea39f356c852bf.jpeg"
+                            },
+                            {
+                                "id": 51,
+                                "url": "https://cdn.pixabay.com/photo/2015/07/12/14/26/coffee-842020__480.jpg"
+                            },
+                            {
+                                "id": 52,
+                                "url": "https://media.istockphoto.com/photos/traditional-cafe-picture-id1356951371?b=1&k=20&m=1356951371&s=170667a&w=0&h=OCoZRi_qJmIiUvMRt8qMxHVraRtklgte4QtfDbeFSgM="
+                            },
+                            {
+                                "id": 53,
+                                "url": "https://cdn.pixabay.com/photo/2014/12/11/02/55/cereals-563796__480.jpg"
+                            },
+                            {
+                                "id": 54,
+                                "url": "https://images.unsplash.com/photo-1481391032119-d89fee407e44?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTR8fGZvb2RzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60"
+                            },
+                            {
+                                "id": 55,
+                                "url": "https://cdn.pixabay.com/photo/2017/07/28/14/29/macarons-2548827__480.jpg"
+                            }
+                        ],
+                        "menus": [
+                            {
+                                "id": 1,
+                                "name": "까눌레",
+                                "price": "3000",
+                                "is_signature": True
+                            },
+                            {
+                                "id": 2,
+                                "name": "아메리카노",
+                                "price": "5000",
+                                "is_signature": True
+                            },
+                            {
+                                "id": 3,
+                                "name": "핸드드립",
+                                "price": "6000",
+                                "is_signature": False
+                            }
+                        ]
+                }
             })
             self.assertEqual(response.status_code, 200)
