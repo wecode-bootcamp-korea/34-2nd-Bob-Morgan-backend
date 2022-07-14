@@ -83,3 +83,35 @@ class PlaceSearchView(View):
 
         except KeyError:
             return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
+
+class PlaceDetailView(View):
+    def get(self, request, place_id):
+        try:
+            place   = Place.objects.prefetch_related('placemenu_set__price', 'placemenu_set__menu').get(id=place_id)
+            results = {
+                'place_id'                           : place.id,
+                'place_name'                         : place.name,
+                'place_address'                      : place.address,
+                'place_opening_hours'                : place.opening_hours,
+                'place_description'                  : place.description,
+                'place_maximum_number_of_subscriber' : place.maximum_number_of_subscriber,
+                'place_latitude'                     : place.latitude,
+                'place_longitude'                    : place.longitude,
+                'place_able_to_reserve'              : place.able_to_reserve,
+                'place_closed_temporarily'           : place.closed_temporarily,
+                'place_category'                     : place.category.name,
+                'place_region'                       : place.region.name,
+                'place_images'                   : [{
+                    'id'  : image.id,
+                    'url' : image.image_url,
+                    } for image in place.image_set.all()],
+                'menus'                              : [{
+                    'id'           : placemenu.menu.id,
+                    'name'         : placemenu.menu.name ,
+                    'price'        : placemenu.price.price,
+                    'is_signature' : placemenu.is_signature,
+                } for placemenu in place.placemenu_set.all()],
+            }
+            return JsonResponse({'results' : results}, status = 200)
+        except Place.DoesNotExist:
+            return JsonResponse({'message' : 'PLACE_DOES_NOT_EXIST'}, status = 400)
